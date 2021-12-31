@@ -24,7 +24,7 @@ contract TokenFarm is Ownable {
         dappToken = IERC20(_dappTokenAddress);
     }
 
-    function setPriceFeedContract(address _token, address _priceFeed) public {
+    function setPriceFeedContract(address _token, address _priceFeed) public onlyOwner{
         tokenPriceFeedMapping[_token] = _priceFeed;
     }
 
@@ -79,7 +79,11 @@ contract TokenFarm is Ownable {
         stakingBalance[_token][msg.sender] = 0;
         uniqueTokensStaked[msg.sender] = uniqueTokensStaked[msg.sender] - 1;
         if (uniqueTokensStaked[msg.sender] == 0) {
-            stakers.remove(msg.sender);
+            for (uint i = 0; i < stakers.length; i++) {
+                if (msg.sender == stakers[i]) {
+                    delete stakers[i];
+                }
+            }
         }
     }
 
@@ -89,7 +93,7 @@ contract TokenFarm is Ownable {
         }
     }
 
-    function addAllowedTokens(address _token) public {
+    function addAllowedTokens(address _token) public onlyOwner {
         require(_token != address(0), "Token must not be the null address");
         // require(allowedTokens.length < 10, "Too many allowed tokens");
         allowedTokens.push(_token);
